@@ -38,3 +38,98 @@ EVIDENCE (RUN #3): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mode
 
 BUNDLE (RUN #4): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-4__task-1.4__ref-R4__20260308T163454Z | HOW_TO_RUN: run.sh/run.bat
 EVIDENCE (RUN #4): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-2__task-1.2__ref-R2__20260308T160259Z/run-3__task-1.3__ref-R3__20260308T161636Z/auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-4__task-1.4__ref-R4__20260308T163454Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-2__task-1.2__ref-R2__20260308T160259Z/run-3__task-1.3__ref-R3__20260308T161636Z/auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-4__task-1.4__ref-R4__20260308T163454Z/logs/worker_startup.txt | VALIDATED_CLI: manual verification (rg unavailable) | EXIT_CODE: 0 (manual) | RESULT: PASS | GIT_REPO: none | FILES: README.md, SETUP.md, USAGE.md, requirements.txt
+
+## 2. Efficiency Optimization
+
+- [ ] 2.1 Add progress tracking infrastructure [#R5]
+  - ACCEPT: Add `_format_elapsed()` and `_log_phase()` helper functions to main.py after line 36 (after `_log` function).
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.1__ref-R5__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.2 Add podcast header display [#R6]
+  - ACCEPT: In the summarize loop (line ~1004), add podcast header display showing "Podcast X/Y" before each episode processing.
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.2__ref-R6__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.3 Enhance download progress display [#R7]
+  - ACCEPT: Update `_print_progress` calls in `_download_to_file` function to show "[1/3] 下载音频" phase prefix.
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.3__ref-R7__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.4 Enhance Whisper progress display [#R8]
+  - ACCEPT: Update Whisper transcription progress to show "[2/3]" prefix and elapsed time using `_format_elapsed()`.
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.4__ref-R8__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.5 Add DeepSeek API retry logic [#R9]
+  - ACCEPT: Add `_retry_with_backoff()` function and wrap DeepSeek API calls with retry (3 attempts, backoff 5/10/20 seconds).
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.5__ref-R9__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.6 Increase default DeepSeek timeout [#R10]
+  - ACCEPT: Change `--deepseek-timeout-seconds` default from 30 to 120 in argument parser.
+  - TEST: SCOPE: CLI
+    - `python3 main.py summarize --help` shows default=120 for timeout
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.6__ref-R10__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.7 Add download retry logic [#R11]
+  - ACCEPT: Wrap HTTP download in `_download_to_file` with retry logic (2 attempts, backoff 3/6 seconds).
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.7__ref-R11__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.8 Handle single podcast failures gracefully [#R12]
+  - ACCEPT: Continue processing after single podcast failure instead of exiting; add summary report at end showing success/failure counts.
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.8__ref-R12__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.9 Add --force flag [#R13]
+  - ACCEPT: Add `--force` argument to summarize command that forces re-processing even if output exists.
+  - TEST: SCOPE: CLI
+    - `python3 main.py summarize --help` shows --force option
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.9__ref-R13__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.10 Add skip-already-processed logic [#R14]
+  - ACCEPT: Add `_find_existing_summary()` function and skip check in loop; skip episodes if output file already exists (unless --force).
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.10__ref-R14__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.11 Increase Whisper segment duration [#R15]
+  - ACCEPT: Change `segment_seconds` from 300 to 600 in `_transcribe_with_python_whisper` function.
+  - TEST: SCOPE: CLI
+    - `python3 -m py_compile main.py` exits with code 0
+    - grep shows `segment_seconds = 600`
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.11__ref-R15__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.12 Final integration test [#R16]
+  - ACCEPT: All code compiles and imports correctly; help text shows new --force flag.
+  - TEST: SCOPE: CLI
+    - `python3 -c "import main; print('OK')"` prints OK
+    - `python3 main.py summarize --help | grep force` shows --force option
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.12__ref-R16__<YYYYMMDDThhmmssZ>/`
+
+- [ ] 2.13 Push to GitHub [#R17]
+  - ACCEPT: All commits pushed to remote repository.
+  - TEST: SCOPE: CLI
+    - `git push origin main` succeeds
+    - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
+    - run-folder MUST be: `run-<RUN4>__task-2.13__ref-R17__<YYYYMMDDThhmmssZ>/`

@@ -45,6 +45,149 @@
         "Run: SCOPE: CLI"
       ],
       "passes": true
+    },
+    "R5": {
+      "category": "enhancement",
+      "description": "Add progress tracking infrastructure",
+      "task_id": "2.1",
+      "accept": "Add _format_elapsed() and _log_phase() helper functions to main.py",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R6": {
+      "category": "enhancement",
+      "description": "Add podcast header display",
+      "task_id": "2.2",
+      "accept": "Show Podcast X/Y header before each episode processing",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R7": {
+      "category": "enhancement",
+      "description": "Enhance download progress display",
+      "task_id": "2.3",
+      "accept": "Show [1/3] phase prefix in download progress",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R8": {
+      "category": "enhancement",
+      "description": "Enhance Whisper progress display",
+      "task_id": "2.4",
+      "accept": "Show [2/3] prefix and elapsed time in Whisper progress",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R9": {
+      "category": "reliability",
+      "description": "Add DeepSeek API retry logic",
+      "task_id": "2.5",
+      "accept": "Retry DeepSeek API calls 3 times with exponential backoff",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R10": {
+      "category": "reliability",
+      "description": "Increase default DeepSeek timeout",
+      "task_id": "2.6",
+      "accept": "Default timeout changed from 30 to 120 seconds",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 main.py summarize --help shows default=120"
+      ],
+      "passes": false
+    },
+    "R11": {
+      "category": "reliability",
+      "description": "Add download retry logic",
+      "task_id": "2.7",
+      "accept": "Retry audio download 2 times with backoff",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R12": {
+      "category": "reliability",
+      "description": "Handle single podcast failures gracefully",
+      "task_id": "2.8",
+      "accept": "Continue processing after single failure; show summary report at end",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R13": {
+      "category": "feature",
+      "description": "Add --force flag",
+      "task_id": "2.9",
+      "accept": "Add --force argument to summarize command",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 main.py summarize --help shows --force"
+      ],
+      "passes": false
+    },
+    "R14": {
+      "category": "feature",
+      "description": "Add skip-already-processed logic",
+      "task_id": "2.10",
+      "accept": "Skip episodes if output file already exists unless --force",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0"
+      ],
+      "passes": false
+    },
+    "R15": {
+      "category": "optimization",
+      "description": "Increase Whisper segment duration",
+      "task_id": "2.11",
+      "accept": "Change segment_seconds from 300 to 600",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "grep shows segment_seconds = 600"
+      ],
+      "passes": false
+    },
+    "R16": {
+      "category": "testing",
+      "description": "Final integration test",
+      "task_id": "2.12",
+      "accept": "All code compiles and imports correctly",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -c 'import main; print(OK)' prints OK"
+      ],
+      "passes": false
+    },
+    "R17": {
+      "category": "deployment",
+      "description": "Push to GitHub",
+      "task_id": "2.13",
+      "accept": "All commits pushed to remote repository",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "git push origin main succeeds"
+      ],
+      "passes": false
     }
   }
 }
