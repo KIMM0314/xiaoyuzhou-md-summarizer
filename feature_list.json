@@ -211,7 +211,7 @@
         "python3 -m py_compile main.py exits with code 0",
         "Grep confirms timeout cap is implemented"
       ],
-      "passes": false
+      "passes": true
     },
     "R20": {
       "category": "bugfix",

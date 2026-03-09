@@ -202,15 +202,18 @@ Note: Based on comprehensive code review identifying critical resource leaks and
     - run-folder MUST be: `run-<RUN#>__task-3.1__ref-R18__<YYYYMMDDThhmmssZ>/`
 
 BUNDLE (RUN #19): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-19__task-3.1__ref-R18__20260309T234431Z/ | HOW_TO_RUN: run.sh/run.bat
-EVIDENCE (RUN #19): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-19__task-3.1__ref-R18__20260309T234431Z/ | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-19__task-3.1__ref-R18__20260309T234431Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (line 161: with open context manager)
+EVIDENCE (RUN #19): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-19__task-3.1__ref-R18__20260309T234431Z/ | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-19__task-3.1__ref-R18__20260309T234431Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: 5fa8f1b | COMMIT_MSG: "Fix file handle leak in _read_text_file (task 3.1, R18)" | DIFFSTAT: "7 files changed, 180 insertions(+), 1 deletion(-)" | FILES: main.py (line 161: with open context manager), tasks.md, feature_list.json, validation bundle
 
-- [ ] 3.2 Add total timeout cap for API calls [#R19]
+- [x] 3.2 Add total timeout cap for API calls [#R19]
   - ACCEPT: Add a total timeout parameter to _retry_with_backoff that caps total time across all retries (e.g. 300 seconds max).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - Grep confirms timeout cap is implemented
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN#>__task-3.2__ref-R19__<YYYYMMDDThhmmssZ>/`
+
+BUNDLE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (lines 58,64,78: total_timeout parameter with 300s default)
 
 - [ ] 3.3 Fix Whisper model cache memory leak [#R20]
   - ACCEPT: Add explicit model cleanup after transcription completes. Use del + gc.collect() or implement model pooling with size limits.

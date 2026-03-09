@@ -55,10 +55,16 @@ def _retry_with_backoff(
     *,
     retries: int,
     backoff_seconds: tuple[int, ...],
+    total_timeout: Optional[float] = 300.0,
 ) -> object:
+    start_time = time.time()
     total_attempts = max(0, retries) + 1
     last_error: Optional[Exception] = None
     for attempt in range(1, total_attempts + 1):
+        if total_timeout is not None and total_timeout > 0 and time.time() - start_time > total_timeout:
+            raise TimeoutError(
+                f"{operation_name} 超过总超时 {total_timeout:.0f} 秒（已用 {_format_elapsed(start_time)}）"
+            ) from last_error
         try:
             return action()
         except Exception as e:
@@ -68,6 +74,14 @@ def _retry_with_backoff(
             delay = backoff_seconds[min(attempt - 1, len(backoff_seconds) - 1)] if backoff_seconds else 0
             _log(f"{operation_name} 失败（第 {attempt}/{total_attempts} 次）: {e}")
             if delay > 0:
+                if (
+                    total_timeout is not None
+                    and total_timeout > 0
+                    and (time.time() - start_time) + delay > total_timeout
+                ):
+                    raise TimeoutError(
+                        f"{operation_name} 需要等待 {delay} 秒重试，但将超过总超时 {total_timeout:.0f} 秒（已用 {_format_elapsed(start_time)}）"
+                    ) from last_error
                 _log(f"{operation_name} 将在 {delay} 秒后重试")
                 time.sleep(delay)
     raise RuntimeError(f"{operation_name} 在 {total_attempts} 次尝试后仍失败: {last_error}")
@@ -297,6 +311,7 @@ def _deepseek_summarize_markdown(
             _request_once,
             retries=3,
             backoff_seconds=(5, 10, 20),
+            total_timeout=300.0,
         )
     except Exception as e:
         raise RuntimeError(f"DeepSeek API request failed: {e}")
@@ -731,6 +746,7 @@ def _download_to_file(url: str, dest_path: str) -> None:
             _download_http_once,
             retries=2,
             backoff_seconds=(3, 6),
+            total_timeout=None,
         )
     except Exception:
         try:
