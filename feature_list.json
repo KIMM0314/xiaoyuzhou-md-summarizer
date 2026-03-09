@@ -1,0 +1,50 @@
+{
+  "change_id": "add-xiaoyuzhou-md-summarizer",
+  "generated_at": "2026-03-08T15:39:31Z",
+  "features": {
+    "R1": {
+      "category": "functional",
+      "description": "Implement Markdown-to-link extraction and XiaoYuzhou filtering CLI flow",
+      "task_id": "1.1",
+      "accept": "CLI accepts `--md-file`, extracts links from Markdown syntax and plain URLs, and filters to XiaoYuzhou domains.",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "Run: SCOPE: CLI"
+      ],
+      "passes": true
+    },
+    "R2": {
+      "category": "functional",
+      "description": "Implement text-first retrieval with audio fallback and local Whisper transcription",
+      "task_id": "1.2",
+      "accept": "If webpage text is sufficient it is used directly; if insufficient, audio is downloaded and transcribed via local Whisper command.",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "Run: SCOPE: CLI"
+      ],
+      "passes": true
+    },
+    "R3": {
+      "category": "functional",
+      "description": "Implement DeepSeek summarization and output persistence to target directory",
+      "task_id": "1.3",
+      "accept": "CLI calls DeepSeek with source text, writes per-episode `summary.md`, and writes `all_summaries.md`.",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "Run: SCOPE: CLI"
+      ],
+      "passes": true
+    },
+    "R4": {
+      "category": "docs",
+      "description": "Add usage documentation and runtime dependency manifest",
+      "task_id": "1.4",
+      "accept": "Repository includes clear setup and run instructions, required environment variables, and CLI parameter examples.",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "Run: SCOPE: CLI"
+      ],
+      "passes": true
+    }
+  }
+}

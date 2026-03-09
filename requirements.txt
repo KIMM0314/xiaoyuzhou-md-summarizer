@@ -1,0 +1,5 @@
+# Runtime dependency manifest (Python).
+#
+# This project intentionally uses only the Python standard library at runtime.
+# If you add third-party Python packages in the future, pin them here.
+
