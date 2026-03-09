@@ -1,0 +1,2 @@
+fatal: unable to access 'https://github.com/KIMM0314/xiaoyuzhou-md-summarizer.git/': Could not resolve host: github.com
+EXIT_CODE=128

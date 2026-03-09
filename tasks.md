@@ -169,3 +169,6 @@ EVIDENCE (RUN #15): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_B
 
 BUNDLE (RUN #16): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
 EVIDENCE (RUN #16): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #17): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #17): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 128 | RESULT: FAIL | ERROR: fatal: could not read Username for 'https://github.com': Device not configured
