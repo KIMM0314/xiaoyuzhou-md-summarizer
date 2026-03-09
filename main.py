@@ -158,7 +158,8 @@ class _HTMLTextExtractor(html.parser.HTMLParser):
 
 
 def _read_text_file(path: str) -> str:
-    return open(path, "r", encoding="utf-8").read()
+    with open(path, "r", encoding="utf-8") as f:  # _read_text_file
+        return f.read()
 
 
 def _read_json_file(path: str) -> dict:

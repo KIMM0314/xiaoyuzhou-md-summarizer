@@ -188,6 +188,66 @@
         "git push origin main succeeds"
       ],
       "passes": false
+    },
+    "R18": {
+      "category": "bugfix",
+      "description": "Fix file handle leak in _read_text_file",
+      "task_id": "3.1",
+      "accept": "Replace manual open/read pattern with context manager (with statement) in _read_text_file function at line 161",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0",
+        "Grep confirms 'with open(' pattern is used"
+      ],
+      "passes": true
+    },
+    "R19": {
+      "category": "reliability",
+      "description": "Add total timeout cap for API calls",
+      "task_id": "3.2",
+      "accept": "Add a total timeout parameter to _retry_with_backoff that caps total time across all retries (e.g. 300 seconds max)",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0",
+        "Grep confirms timeout cap is implemented"
+      ],
+      "passes": false
+    },
+    "R20": {
+      "category": "bugfix",
+      "description": "Fix Whisper model cache memory leak",
+      "task_id": "3.3",
+      "accept": "Add explicit model cleanup after transcription completes. Use del + gc.collect() or implement model pooling with size limits",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0",
+        "Grep confirms cleanup code is present"
+      ],
+      "passes": false
+    },
+    "R21": {
+      "category": "bugfix",
+      "description": "Fix incomplete temp audio segment cleanup",
+      "task_id": "3.4",
+      "accept": "Wrap audio segment processing in try/finally to ensure temp files are always deleted, even on errors",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0",
+        "Grep confirms try/finally cleanup pattern"
+      ],
+      "passes": false
+    },
+    "R22": {
+      "category": "bugfix",
+      "description": "Fix HTTP retry logic to skip non-retryable errors",
+      "task_id": "3.5",
+      "accept": "Modify _retry_with_backoff to check HTTP status codes and skip retrying 4xx errors (only retry 5xx and network errors)",
+      "test": "SCOPE: CLI",
+      "steps": [
+        "python3 -m py_compile main.py exits with code 0",
+        "Grep confirms status code checking logic"
+      ],
+      "passes": false
     }
   }
 }
