@@ -36,6 +36,22 @@ def _log(message: str) -> None:
     print(f"[{ts}] {message}", file=sys.stderr, flush=True)
 
 
+_PHASE_START_TIME: float = 0.0
+
+
+def _format_elapsed(start_time: float) -> str:
+    elapsed = time.time() - start_time
+    minutes = int(elapsed // 60)
+    seconds = int(elapsed % 60)
+    return f"{minutes}:{seconds:02d}"
+
+
+def _log_phase(phase: int, total_phases: int, message: str, start_time: float = 0.0) -> None:
+    ts = time.strftime("%H:%M:%S")
+    elapsed_str = f" | elapsed {_format_elapsed(start_time)}" if start_time > 0 else ""
+    print(f"[{ts}] [{phase}/{total_phases}] {message}{elapsed_str}", file=sys.stderr, flush=True)
+
+
 def _normalize_candidate_url(candidate: str) -> str:
     candidate = candidate.strip()
     if candidate.startswith("<") and candidate.endswith(">"):
