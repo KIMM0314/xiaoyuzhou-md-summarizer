@@ -173,7 +173,10 @@ EVIDENCE (RUN #16): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_B
 BUNDLE (RUN #17): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z | HOW_TO_RUN: run.sh/run.bat
 EVIDENCE (RUN #17): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-17__task-2.13__ref-R17__20260309T153958Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 128 | RESULT: FAIL | ERROR: fatal: could not read Username for 'https://github.com': Device not configured
 
-BLOCKED (RUN #17, Attempt #1): Git push failed due to missing GitHub credentials (not a code/feature issue).
+BUNDLE (RUN #18): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-18__task-2.13__ref-R17__20260309T213749Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #18): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-18__task-2.13__ref-R17__20260309T213749Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-18__task-2.13__ref-R17__20260309T213749Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 128 | RESULT: FAIL | ERROR: fatal: could not read Username for 'https://github.com': Device not configured
+
+MAXED (RUN #18, Attempt #2/2): Git push failed AGAIN due to missing GitHub credentials (same error as RUN #17, Attempt #1).
   Error: fatal: could not read Username for 'https://github.com': Device not configured
   Root cause: GitHub credentials not configured (SSH key or HTTPS personal access token).
 NEEDS: User must configure GitHub credentials to enable push to remote repository.
@@ -185,4 +188,4 @@ NEEDS: User must configure GitHub credentials to enable push to remote repositor
     - Generate token: GitHub Settings → Developer settings → Personal access tokens → Generate new token
     - Configure credential helper: git config --global credential.helper store
     - On next push, use token as password
-  After configuration: Re-run task 2.13 with RUN #18, Attempt #2
+  After configuration: Re-run task 2.13 with RUN #19, Attempt #3 (or user may push manually)
