@@ -55,7 +55,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R6": {
       "category": "enhancement",
@@ -66,7 +66,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R7": {
       "category": "enhancement",
@@ -77,7 +77,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R8": {
       "category": "enhancement",
@@ -88,7 +88,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R9": {
       "category": "reliability",
@@ -99,7 +99,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R10": {
       "category": "reliability",
@@ -110,7 +110,7 @@
       "steps": [
         "python3 main.py summarize --help shows default=120"
       ],
-      "passes": false
+      "passes": true
     },
     "R11": {
       "category": "reliability",
@@ -121,7 +121,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R12": {
       "category": "reliability",
@@ -132,7 +132,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R13": {
       "category": "feature",
@@ -143,7 +143,7 @@
       "steps": [
         "python3 main.py summarize --help shows --force"
       ],
-      "passes": false
+      "passes": true
     },
     "R14": {
       "category": "feature",
@@ -154,7 +154,7 @@
       "steps": [
         "python3 -m py_compile main.py exits with code 0"
       ],
-      "passes": false
+      "passes": true
     },
     "R15": {
       "category": "optimization",
@@ -165,7 +165,7 @@
       "steps": [
         "grep shows segment_seconds = 600"
       ],
-      "passes": false
+      "passes": true
     },
     "R16": {
       "category": "testing",
@@ -176,7 +176,7 @@
       "steps": [
         "python3 -c 'import main; print(OK)' prints OK"
       ],
-      "passes": false
+      "passes": true
     },
     "R17": {
       "category": "deployment",
