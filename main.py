@@ -571,6 +571,88 @@ def _find_existing_summary(output_dir: str, basename: str) -> Optional[str]:
     return numbered[0][1]
 
 
+def _find_existing_summary_for_url(output_dir: str, episode_url: str) -> Optional[str]:
+    """
+    Best-effort fast skip lookup to avoid expensive download/transcription.
+
+    Strategy:
+    1) Parse output_dir/all_summaries.md for URL -> FILE mapping (preferred, O(size of file)).
+    2) Fallback: scan the beginning of each .md file for the URL substring.
+    """
+    if not os.path.isdir(output_dir):
+        return None
+
+    index_path = os.path.join(output_dir, "all_summaries.md")
+    if os.path.exists(index_path):
+        try:
+            url_line = f"- URL: {episode_url}".strip()
+            file_prefix = "- FILE: "
+            with open(index_path, "r", encoding="utf-8") as f:
+                pending_match = False
+                for raw_line in f:
+                    line = (raw_line or "").strip()
+                    if pending_match:
+                        if line.startswith(file_prefix):
+                            filename = line[len(file_prefix) :].strip()
+                            if filename:
+                                candidate = os.path.join(output_dir, filename)
+                                if os.path.exists(candidate):
+                                    return candidate
+                            pending_match = False
+                        elif line.startswith("## ") or line.startswith("- URL: "):
+                            pending_match = False
+                        continue
+
+                    if line == url_line:
+                        pending_match = True
+        except OSError:
+            pass
+
+    try:
+        names = os.listdir(output_dir)
+    except OSError:
+        return None
+
+    scan_bytes = 16 * 1024
+    for name in names:
+        if not name.endswith(".md"):
+            continue
+        if name == "all_summaries.md":
+            continue
+        path = os.path.join(output_dir, name)
+        try:
+            with open(path, "rb") as f:
+                head = f.read(scan_bytes)
+            if episode_url.encode("utf-8") in head:
+                return path
+        except OSError:
+            continue
+    return None
+
+
+def _should_skip_podcast(episode_url: str, output_dir: str, force: bool) -> tuple[bool, Optional[str]]:
+    """Check if podcast summary already exists (unless --force)."""
+    if force:
+        return False, None
+    existing = _find_existing_summary_for_url(output_dir, episode_url)
+    if existing:
+        return True, existing
+    return False, None
+
+
+def _append_to_all_summaries(all_summaries: list[str], *, episode_url: str, summary_path: str) -> None:
+    all_summaries.append(f"## {os.path.splitext(os.path.basename(summary_path))[0]}")
+    all_summaries.append("")
+    all_summaries.append(f"- URL: {episode_url}")
+    all_summaries.append(f"- FILE: {os.path.basename(summary_path)}")
+    all_summaries.append("")
+    try:
+        all_summaries.append(_read_text_file(summary_path).rstrip())
+    except OSError:
+        all_summaries.append("(Failed to read summary file content.)")
+    all_summaries.append("")
+
+
 def _is_text_sufficient(text: str, *, min_words: int, min_chars: int, min_cjk_chars: int) -> bool:
     cleaned = re.sub(r"\s+", " ", text).strip()
     if not cleaned:
@@ -1106,6 +1188,18 @@ def main(argv: list[str]) -> int:
             _log("=" * 72)
             _log(f"Podcast {idx}/{total}")
             _log(f"URL: {episode_url}")
+
+            should_skip, existing_file = _should_skip_podcast(episode_url, args.output_dir, bool(args.force))
+            if should_skip and existing_file:
+                skipped_count += 1
+                _log_phase(
+                    1,
+                    3,
+                    f"已存在摘要，跳过（可用 --force 覆盖）: {existing_file}",
+                    start_time=episode_started_at,
+                )
+                _append_to_all_summaries(all_summaries, episode_url=episode_url, summary_path=existing_file)
+                continue
             try:
                 _log_phase(1, 3, "开始获取播客内容")
                 source, source_text, metadata = retrieve_text_with_audio_fallback(
@@ -1132,6 +1226,7 @@ def main(argv: list[str]) -> int:
             if existing_summary and not args.force:
                 skipped_count += 1
                 _log_phase(3, 3, f"已存在摘要，跳过（可用 --force 覆盖）: {existing_summary}", start_time=episode_started_at)
+                _append_to_all_summaries(all_summaries, episode_url=episode_url, summary_path=existing_summary)
                 continue
 
             try:
@@ -1156,14 +1251,7 @@ def main(argv: list[str]) -> int:
                 f.write(summary_md)
             success_count += 1
             _log_phase(3, 3, f"已写入: {summary_path}", start_time=episode_started_at)
-
-            all_summaries.append(f"## {os.path.splitext(os.path.basename(summary_path))[0]}")
-            all_summaries.append("")
-            all_summaries.append(f"- URL: {episode_url}")
-            all_summaries.append(f"- FILE: {os.path.basename(summary_path)}")
-            all_summaries.append("")
-            all_summaries.append(summary_md.rstrip())
-            all_summaries.append("")
+            _append_to_all_summaries(all_summaries, episode_url=episode_url, summary_path=summary_path)
 
         with open(os.path.join(args.output_dir, "all_summaries.md"), "w", encoding="utf-8") as f:
             f.write("\n".join(all_summaries).rstrip() + "\n")
