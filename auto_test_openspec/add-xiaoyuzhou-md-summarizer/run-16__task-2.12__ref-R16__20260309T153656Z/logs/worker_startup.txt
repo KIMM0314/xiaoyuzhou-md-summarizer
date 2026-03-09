@@ -1,0 +1,4 @@
+timestamp_utc=2026-03-09T15:36:57Z
+task=2.12
+ref=R16
+command=python3 -c "import main; print('OK')" && python3 main.py summarize --help | grep force

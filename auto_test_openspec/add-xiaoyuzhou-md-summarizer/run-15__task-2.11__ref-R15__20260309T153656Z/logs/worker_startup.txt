@@ -1,0 +1,4 @@
+timestamp_utc=2026-03-09T15:36:57Z
+task=2.11
+ref=R15
+command=python3 -m py_compile main.py && rg -n "segment_seconds = 600" main.py

@@ -41,77 +41,77 @@ EVIDENCE (RUN #4): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mode
 
 ## 2. Efficiency Optimization
 
-- [ ] 2.1 Add progress tracking infrastructure [#R5]
+- [x] 2.1 Add progress tracking infrastructure [#R5]
   - ACCEPT: Add `_format_elapsed()` and `_log_phase()` helper functions to main.py after line 36 (after `_log` function).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.1__ref-R5__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.2 Add podcast header display [#R6]
+- [x] 2.2 Add podcast header display [#R6]
   - ACCEPT: In the summarize loop (line ~1004), add podcast header display showing "Podcast X/Y" before each episode processing.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.2__ref-R6__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.3 Enhance download progress display [#R7]
+- [x] 2.3 Enhance download progress display [#R7]
   - ACCEPT: Update `_print_progress` calls in `_download_to_file` function to show "[1/3] 下载音频" phase prefix.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.3__ref-R7__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.4 Enhance Whisper progress display [#R8]
+- [x] 2.4 Enhance Whisper progress display [#R8]
   - ACCEPT: Update Whisper transcription progress to show "[2/3]" prefix and elapsed time using `_format_elapsed()`.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.4__ref-R8__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.5 Add DeepSeek API retry logic [#R9]
+- [x] 2.5 Add DeepSeek API retry logic [#R9]
   - ACCEPT: Add `_retry_with_backoff()` function and wrap DeepSeek API calls with retry (3 attempts, backoff 5/10/20 seconds).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.5__ref-R9__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.6 Increase default DeepSeek timeout [#R10]
+- [x] 2.6 Increase default DeepSeek timeout [#R10]
   - ACCEPT: Change `--deepseek-timeout-seconds` default from 30 to 120 in argument parser.
   - TEST: SCOPE: CLI
     - `python3 main.py summarize --help` shows default=120 for timeout
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.6__ref-R10__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.7 Add download retry logic [#R11]
+- [x] 2.7 Add download retry logic [#R11]
   - ACCEPT: Wrap HTTP download in `_download_to_file` with retry logic (2 attempts, backoff 3/6 seconds).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.7__ref-R11__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.8 Handle single podcast failures gracefully [#R12]
+- [x] 2.8 Handle single podcast failures gracefully [#R12]
   - ACCEPT: Continue processing after single podcast failure instead of exiting; add summary report at end showing success/failure counts.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.8__ref-R12__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.9 Add --force flag [#R13]
+- [x] 2.9 Add --force flag [#R13]
   - ACCEPT: Add `--force` argument to summarize command that forces re-processing even if output exists.
   - TEST: SCOPE: CLI
     - `python3 main.py summarize --help` shows --force option
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.9__ref-R13__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.10 Add skip-already-processed logic [#R14]
+- [x] 2.10 Add skip-already-processed logic [#R14]
   - ACCEPT: Add `_find_existing_summary()` function and skip check in loop; skip episodes if output file already exists (unless --force).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.10__ref-R14__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.11 Increase Whisper segment duration [#R15]
+- [x] 2.11 Increase Whisper segment duration [#R15]
   - ACCEPT: Change `segment_seconds` from 300 to 600 in `_transcribe_with_python_whisper` function.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
@@ -119,7 +119,7 @@ EVIDENCE (RUN #4): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mode
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.11__ref-R15__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 2.12 Final integration test [#R16]
+- [x] 2.12 Final integration test [#R16]
   - ACCEPT: All code compiles and imports correctly; help text shows new --force flag.
   - TEST: SCOPE: CLI
     - `python3 -c "import main; print('OK')"` prints OK
@@ -133,3 +133,39 @@ EVIDENCE (RUN #4): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mode
     - `git push origin main` succeeds
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN4>__task-2.13__ref-R17__<YYYYMMDDThhmmssZ>/`
+
+BUNDLE (RUN #5): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-5__task-2.1__ref-R5__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #5): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-5__task-2.1__ref-R5__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-5__task-2.1__ref-R5__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #6): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-6__task-2.2__ref-R6__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #6): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-6__task-2.2__ref-R6__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-6__task-2.2__ref-R6__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #7): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-7__task-2.3__ref-R7__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #7): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-7__task-2.3__ref-R7__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-7__task-2.3__ref-R7__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #8): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-8__task-2.4__ref-R8__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #8): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-8__task-2.4__ref-R8__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-8__task-2.4__ref-R8__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #9): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-9__task-2.5__ref-R9__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #9): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-9__task-2.5__ref-R9__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-9__task-2.5__ref-R9__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #10): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-10__task-2.6__ref-R10__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #10): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-10__task-2.6__ref-R10__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-10__task-2.6__ref-R10__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #11): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-11__task-2.7__ref-R11__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #11): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-11__task-2.7__ref-R11__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-11__task-2.7__ref-R11__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #12): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-12__task-2.8__ref-R12__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #12): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-12__task-2.8__ref-R12__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-12__task-2.8__ref-R12__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #13): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-13__task-2.9__ref-R13__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #13): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-13__task-2.9__ref-R13__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-13__task-2.9__ref-R13__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #14): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-14__task-2.10__ref-R14__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #14): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-14__task-2.10__ref-R14__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-14__task-2.10__ref-R14__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #15): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-15__task-2.11__ref-R15__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #15): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-15__task-2.11__ref-R15__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-15__task-2.11__ref-R15__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py
+
+BUNDLE (RUN #16): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #16): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-16__task-2.12__ref-R16__20260309T153656Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py

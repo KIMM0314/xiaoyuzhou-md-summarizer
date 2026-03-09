@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import Optional
+from typing import Callable, Optional
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -36,9 +36,6 @@ def _log(message: str) -> None:
     print(f"[{ts}] {message}", file=sys.stderr, flush=True)
 
 
-_PHASE_START_TIME: float = 0.0
-
-
 def _format_elapsed(start_time: float) -> str:
     elapsed = time.time() - start_time
     minutes = int(elapsed // 60)
@@ -50,6 +47,30 @@ def _log_phase(phase: int, total_phases: int, message: str, start_time: float = 
     ts = time.strftime("%H:%M:%S")
     elapsed_str = f" | elapsed {_format_elapsed(start_time)}" if start_time > 0 else ""
     print(f"[{ts}] [{phase}/{total_phases}] {message}{elapsed_str}", file=sys.stderr, flush=True)
+
+
+def _retry_with_backoff(
+    operation_name: str,
+    action: Callable[[], object],
+    *,
+    retries: int,
+    backoff_seconds: tuple[int, ...],
+) -> object:
+    total_attempts = max(0, retries) + 1
+    last_error: Optional[Exception] = None
+    for attempt in range(1, total_attempts + 1):
+        try:
+            return action()
+        except Exception as e:
+            last_error = e
+            if attempt >= total_attempts:
+                break
+            delay = backoff_seconds[min(attempt - 1, len(backoff_seconds) - 1)] if backoff_seconds else 0
+            _log(f"{operation_name} 失败（第 {attempt}/{total_attempts} 次）: {e}")
+            if delay > 0:
+                _log(f"{operation_name} 将在 {delay} 秒后重试")
+                time.sleep(delay)
+    raise RuntimeError(f"{operation_name} 在 {total_attempts} 次尝试后仍失败: {last_error}")
 
 
 def _normalize_candidate_url(candidate: str) -> str:
@@ -265,11 +286,22 @@ def _deepseek_summarize_markdown(
         method="POST",
     )
 
-    try:
+    def _request_once() -> bytes:
         with urlopen(req, timeout=timeout_seconds) as resp:
-            raw = resp.read()
+            return resp.read()
+
+    try:
+        raw = _retry_with_backoff(
+            "DeepSeek API 请求",
+            _request_once,
+            retries=3,
+            backoff_seconds=(5, 10, 20),
+        )
     except Exception as e:
         raise RuntimeError(f"DeepSeek API request failed: {e}")
+
+    if not isinstance(raw, bytes):
+        raise RuntimeError("DeepSeek API request returned non-bytes payload.")
 
     try:
         decoded = json.loads(raw.decode("utf-8", errors="replace"))
@@ -514,6 +546,31 @@ def _unique_markdown_output_path(output_dir: str, basename: str) -> str:
         idx += 1
 
 
+def _find_existing_summary(output_dir: str, basename: str) -> Optional[str]:
+    exact = os.path.join(output_dir, basename + ".md")
+    if os.path.exists(exact):
+        return exact
+
+    if not os.path.isdir(output_dir):
+        return None
+
+    pattern = re.compile(rf"^{re.escape(basename)} \((\d+)\)\.md$")
+    numbered: list[tuple[int, str]] = []
+    for name in os.listdir(output_dir):
+        m = pattern.match(name)
+        if not m:
+            continue
+        try:
+            idx = int(m.group(1))
+        except ValueError:
+            continue
+        numbered.append((idx, os.path.join(output_dir, name)))
+    if not numbered:
+        return None
+    numbered.sort(key=lambda x: x[0])
+    return numbered[0][1]
+
+
 def _is_text_sufficient(text: str, *, min_words: int, min_chars: int, min_cjk_chars: int) -> bool:
     cleaned = re.sub(r"\s+", " ", text).strip()
     if not cleaned:
@@ -561,28 +618,44 @@ def _download_to_file(url: str, dest_path: str) -> None:
                 wf.write(chunk)
                 done += len(chunk)
                 if total > 0:
-                    _print_progress("下载音频", done, total)
+                    _print_progress("[1/3] 下载音频", done, total)
         if total <= 0:
-            _log("下载音频完成")
+            _log("[1/3] 下载音频完成")
         return
 
-    req = Request(url, headers={"User-Agent": _DEFAULT_USER_AGENT})
-    with urlopen(req, timeout=_DEFAULT_HTTP_TIMEOUT_SECONDS) as resp, open(dest_path, "wb") as wf:
-        total_header = resp.headers.get("Content-Length")
-        total = int(total_header) if (total_header and total_header.isdigit()) else 0
-        done = 0
-        while True:
-            chunk = resp.read(chunk_size)
-            if not chunk:
-                break
-            wf.write(chunk)
-            done += len(chunk)
+    def _download_http_once() -> None:
+        req = Request(url, headers={"User-Agent": _DEFAULT_USER_AGENT})
+        with urlopen(req, timeout=_DEFAULT_HTTP_TIMEOUT_SECONDS) as resp, open(dest_path, "wb") as wf:
+            total_header = resp.headers.get("Content-Length")
+            total = int(total_header) if (total_header and total_header.isdigit()) else 0
+            done = 0
+            while True:
+                chunk = resp.read(chunk_size)
+                if not chunk:
+                    break
+                wf.write(chunk)
+                done += len(chunk)
+                if total > 0:
+                    _print_progress("[1/3] 下载音频", done, total)
             if total > 0:
-                _print_progress("下载音频", done, total)
-        if total > 0:
-            _print_progress("下载音频", total, total)
-        else:
-            _log(f"下载音频完成: {done / (1024 * 1024):.1f} MB")
+                _print_progress("[1/3] 下载音频", total, total)
+            else:
+                _log(f"[1/3] 下载音频完成: {done / (1024 * 1024):.1f} MB")
+
+    try:
+        _retry_with_backoff(
+            "音频下载",
+            _download_http_once,
+            retries=2,
+            backoff_seconds=(3, 6),
+        )
+    except Exception:
+        try:
+            if os.path.exists(dest_path):
+                os.remove(dest_path)
+        except OSError:
+            pass
+        raise
 
 
 _WHISPER_MODEL_CACHE: dict[str, object] = {}
@@ -635,7 +708,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
     model_obj = _load_whisper_model_cached(model)
 
     duration = _probe_audio_duration_seconds(audio_path) or 0.0
-    segment_seconds = 300
+    segment_seconds = 600
     segment_paths: list[str] = []
     segment_dir = tempfile.mkdtemp(prefix="xys_segments_", dir=output_dir)
 
@@ -672,6 +745,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
         texts: list[str] = []
         total = len(segment_paths)
         _log(f"Whisper 转写分段数: {total}")
+        transcribe_started_at = time.time()
         for idx, seg_path in enumerate(segment_paths, start=1):
             result = model_obj.transcribe(
                 seg_path,
@@ -681,7 +755,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
             chunk_text = (result.get("text") or "").strip()
             if chunk_text:
                 texts.append(chunk_text)
-            _print_progress("转写进度", idx, total)
+            _print_progress(f"[2/3] 转写进度 | elapsed {_format_elapsed(transcribe_started_at)}", idx, total)
 
         transcript_text = "\n".join(t for t in texts if t).strip()
         if not transcript_text:
@@ -944,8 +1018,8 @@ def main(argv: list[str]) -> int:
     summarize_parser.add_argument(
         "--deepseek-timeout-seconds",
         type=int,
-        default=30,
-        help="DeepSeek request timeout in seconds (default: 30).",
+        default=120,
+        help="DeepSeek request timeout in seconds (default: 120).",
     )
     summarize_parser.add_argument(
         "--force-audio-transcription",
@@ -957,6 +1031,12 @@ def main(argv: list[str]) -> int:
         "--output-dir",
         required=True,
         help="Target directory to write <publish_date>_<title>.md files and all_summaries.md.",
+    )
+    summarize_parser.add_argument(
+        "--force",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Force re-processing even when summary output already exists (default: false).",
     )
 
     args = parser.parse_args(argv)
@@ -1016,11 +1096,19 @@ def main(argv: list[str]) -> int:
         all_summaries: list[str] = ["# All episode summaries", ""]
         total = len(deduped)
         _log(f"准备处理 {total} 个播客链接")
+        success_count = 0
+        failure_count = 0
+        skipped_count = 0
+        failures: list[tuple[str, str]] = []
 
         for idx, episode_url in enumerate(deduped, start=1):
+            episode_started_at = time.time()
+            _log("=" * 72)
+            _log(f"Podcast {idx}/{total}")
+            _log(f"URL: {episode_url}")
             try:
-                _log(f"[{idx}/{total}] 开始获取播客内容")
-                _, source_text, metadata = retrieve_text_with_audio_fallback(
+                _log_phase(1, 3, "开始获取播客内容")
+                source, source_text, metadata = retrieve_text_with_audio_fallback(
                     episode_url,
                     min_words=args.min_words,
                     min_chars=args.min_chars,
@@ -1030,13 +1118,24 @@ def main(argv: list[str]) -> int:
                     work_dir=work_dir,
                     force_audio_transcription=bool(args.force_audio_transcription),
                 )
-                _log(f"[{idx}/{total}] 获取完成，来源={_}")
+                _log_phase(1, 3, f"获取完成，来源={source}", start_time=episode_started_at)
             except Exception as e:
+                failure_count += 1
+                failures.append((episode_url, f"retrieve failed: {e}"))
                 print(f"ERROR: Failed to retrieve {episode_url}: {e}", file=sys.stderr)
-                return 3
+                continue
+
+            publish_date = _sanitize_filename_component(metadata.get("publish_date", "unknown-date"))
+            title = _sanitize_filename_component(metadata.get("title", _episode_id_from_url(episode_url)))
+            summary_basename = f"{publish_date}_{title}"
+            existing_summary = _find_existing_summary(args.output_dir, summary_basename)
+            if existing_summary and not args.force:
+                skipped_count += 1
+                _log_phase(3, 3, f"已存在摘要，跳过（可用 --force 覆盖）: {existing_summary}", start_time=episode_started_at)
+                continue
 
             try:
-                _log(f"[{idx}/{total}] 开始调用 DeepSeek 总结")
+                _log_phase(3, 3, "开始调用 DeepSeek 总结")
                 summary_md = _deepseek_summarize_markdown(
                     source_text.strip(),
                     metadata=metadata,
@@ -1045,18 +1144,18 @@ def main(argv: list[str]) -> int:
                     base_url=args.deepseek_base_url,
                     timeout_seconds=max(1, int(args.deepseek_timeout_seconds)),
                 )
-                _log(f"[{idx}/{total}] DeepSeek 返回完成")
+                _log_phase(3, 3, "DeepSeek 返回完成", start_time=episode_started_at)
             except Exception as e:
+                failure_count += 1
+                failures.append((episode_url, f"summarize failed: {e}"))
                 print(f"ERROR: DeepSeek summarization failed for {episode_url}: {e}", file=sys.stderr)
-                return 4
+                continue
 
-            publish_date = _sanitize_filename_component(metadata.get("publish_date", "unknown-date"))
-            title = _sanitize_filename_component(metadata.get("title", _episode_id_from_url(episode_url)))
-            summary_basename = f"{publish_date}_{title}"
             summary_path = _unique_markdown_output_path(args.output_dir, summary_basename)
             with open(summary_path, "w", encoding="utf-8") as f:
                 f.write(summary_md)
-            _log(f"[{idx}/{total}] 已写入: {summary_path}")
+            success_count += 1
+            _log_phase(3, 3, f"已写入: {summary_path}", start_time=episode_started_at)
 
             all_summaries.append(f"## {os.path.splitext(os.path.basename(summary_path))[0]}")
             all_summaries.append("")
@@ -1069,10 +1168,17 @@ def main(argv: list[str]) -> int:
         with open(os.path.join(args.output_dir, "all_summaries.md"), "w", encoding="utf-8") as f:
             f.write("\n".join(all_summaries).rstrip() + "\n")
         _log("已写入汇总文件: all_summaries.md")
+        _log(f"处理结果汇总: success={success_count}, failed={failure_count}, skipped={skipped_count}")
+        if failures:
+            _log("失败条目明细:")
+            for failed_url, reason in failures:
+                _log(f"- {failed_url}: {reason}")
 
         if temp_dir_obj is not None:
             temp_dir_obj.cleanup()
 
+        if failure_count > 0:
+            return 5
         return 0
 
     urls: list[str] = []

@@ -1,0 +1,6 @@
+OK
+                                   [--force-audio-transcription | --no-force-audio-transcription]
+                                   [--force | --no-force]
+  --force-audio-transcription, --no-force-audio-transcription
+  --force, --no-force   Force re-processing even when summary output already
+EXIT_CODE=0

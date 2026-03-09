@@ -1,0 +1,4 @@
+timestamp_utc=2026-03-09T15:36:57Z
+task=2.9
+ref=R13
+command=python3 main.py summarize --help | grep -F -- "--force"
