@@ -1,3 +1,5 @@
 RUN#19 | Task 3.1  | Ref R18 | Commit 5fa8f1b "Fix file handle leak in _read_text_file (task 3.1, R18)" | Diffstat: 7 files changed, 180 insertions(+), 1 deletion(-)
 RUN#20 | Task 3.2  | Ref R19 | Commit 213b780 "Add total timeout cap for API calls (task 3.2, R19)" | Diffstat: 7 files changed, 78 insertions(+), 3 deletions(-)
 RUN #21 | task 3.3 | R20 | commit aaeff4d | Fix Whisper model cache memory leak (task 3.3, R20) | 54 files changed, 120 insertions(+), 4 deletions(-)
+RUN#22 | Task 3.4  | Ref R21 | Commit 4eb3c96 "Fix incomplete temp audio segment cleanup (task 3.4, R21)" | Diffstat: 15 files changed, 246 insertions(+), 490 deletions(-)
+RUN#23 | Task 3.5  | Ref R22 | Commit 19cdfcd "Fix HTTP retry logic to skip non-retryable errors (task 3.5, R22)" | Diffstat: 5 files changed, 103 insertions(+), 1 deletion(-)
