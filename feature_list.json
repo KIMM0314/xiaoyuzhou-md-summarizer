@@ -223,7 +223,7 @@
         "python3 -m py_compile main.py exits with code 0",
         "Grep confirms cleanup code is present"
       ],
-      "passes": false
+      "passes": true
     },
     "R21": {
       "category": "bugfix",

@@ -215,7 +215,7 @@ EVIDENCE (RUN #19): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
 BUNDLE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | HOW_TO_RUN: run.sh/run.bat
 EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: 213b780 | COMMIT_MSG: "Add total timeout cap for API calls (task 3.2, R19)" | DIFFSTAT: "7 files changed, 78 insertions(+), 3 deletions(-)" | FILES: main.py (lines 58,64,78: total_timeout parameter with 300s default), tasks.md, feature_list.json, validation bundle
 
-- [ ] 3.3 Fix Whisper model cache memory leak [#R20]
+- [x] 3.3 Fix Whisper model cache memory leak [#R20]
   - ACCEPT: Add explicit model cleanup after transcription completes. Use del + gc.collect() or implement model pooling with size limits.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
@@ -224,6 +224,7 @@ EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - run-folder MUST be: `run-<RUN#>__task-3.3__ref-R20__<YYYYMMDDThhmmssZ>/`
 
 BUNDLE (RUN #21): LRU Whisper model cache max=2 + finally cleanup (del model_obj + gc.collect) | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/ | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #21): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/ | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/logs/worker_startup.txt | VALIDATED_CLI: python3 -m py_compile main.py && grep "del model_obj" main.py && grep "gc.collect()" main.py && python3 validation check | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: aaeff4d | COMMIT_MSG: "Fix Whisper model cache memory leak (task 3.3, R20)" | DIFFSTAT: "54 files changed, 120 insertions(+), 4 deletions(-)" | FILES: main.py (LRU cache max=2, try/finally cleanup with del+gc.collect), tasks.md, validation bundle
 
 - [ ] 3.4 Fix incomplete temp audio segment cleanup [#R21]
   - ACCEPT: Wrap audio segment processing in try/finally to ensure temp files are always deleted, even on errors.
