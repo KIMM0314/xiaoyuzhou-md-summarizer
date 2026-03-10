@@ -223,10 +223,10 @@ EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN#>__task-3.3__ref-R20__<YYYYMMDDThhmmssZ>/`
 
-BUNDLE (RUN #21): LRU Whisper model cache max=2 + finally cleanup (del model_obj + gc.collect) | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/ | HOW_TO_RUN: run.sh/run.bat
-EVIDENCE (RUN #21): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/ | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/logs/worker_startup.txt | VALIDATED_CLI: python3 -m py_compile main.py && grep "del model_obj" main.py && grep "gc.collect()" main.py && python3 validation check | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: aaeff4d | COMMIT_MSG: "Fix Whisper model cache memory leak (task 3.3, R20)" | DIFFSTAT: "54 files changed, 120 insertions(+), 4 deletions(-)" | FILES: main.py (LRU cache max=2, try/finally cleanup with del+gc.collect), tasks.md, validation bundle
+BUNDLE (RUN #21): LRU Whisper model cache max=2 + finally cleanup (del model_obj + gc.collect) | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309T235741Z/ | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #21): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309T235741Z/ | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309T235741Z/logs/worker_startup.txt | VALIDATED_CLI: python3 -m py_compile main.py && grep "del model_obj" main.py && grep "gc.collect()" main.py && python3 validation check | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: aaeff4d | COMMIT_MSG: "Fix Whisper model cache memory leak (task 3.3, R20)" | DIFFSTAT: "54 files changed, 120 insertions(+), 4 deletions(-)" | FILES: main.py (LRU cache max=2, try/finally cleanup with del+gc.collect), tasks.md, validation bundle
 
-- [ ] 3.4 Fix incomplete temp audio segment cleanup [#R21]
+- [x] 3.4 Fix incomplete temp audio segment cleanup [#R21]
   - ACCEPT: Wrap audio segment processing in try/finally to ensure temp files are always deleted, even on errors.
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
@@ -234,10 +234,16 @@ EVIDENCE (RUN #21): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN#>__task-3.4__ref-R21__<YYYYMMDDThhmmssZ>/`
 
-- [ ] 3.5 Fix HTTP retry logic to skip non-retryable errors [#R22]
+BUNDLE (RUN #22): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #22): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (_transcribe_with_python_whisper inner try/finally + shutil.rmtree cleanup), tasks.md, feature_list.json, validation bundle
+
+- [x] 3.5 Fix HTTP retry logic to skip non-retryable errors [#R22]
   - ACCEPT: Modify _retry_with_backoff to check HTTP status codes and skip retrying 4xx errors (only retry 5xx and network errors).
   - TEST: SCOPE: CLI
     - `python3 -m py_compile main.py` exits with code 0
     - Grep confirms status code checking logic
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN#>__task-3.5__ref-R22__<YYYYMMDDThhmmssZ>/`
+
+BUNDLE (RUN #23): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-23__task-3.5__ref-R22__20260310T001842Z | HOW_TO_RUN: run.sh/run.bat
+EVIDENCE (RUN #23): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-23__task-3.5__ref-R22__20260310T001842Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-23__task-3.5__ref-R22__20260310T001842Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (_extract_http_status_code + 4xx non-retry guard in _retry_with_backoff), tasks.md, feature_list.json, validation bundle

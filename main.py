@@ -8,6 +8,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -51,6 +52,21 @@ def _log_phase(phase: int, total_phases: int, message: str, start_time: float = 
     print(f"[{ts}] [{phase}/{total_phases}] {message}{elapsed_str}", file=sys.stderr, flush=True)
 
 
+def _extract_http_status_code(error: Exception) -> Optional[int]:
+    for attr in ("code", "status"):
+        value = getattr(error, attr, None)
+        if isinstance(value, int):
+            return value
+
+    response = getattr(error, "response", None)
+    if response is not None:
+        for attr in ("status", "code"):
+            value = getattr(response, attr, None)
+            if isinstance(value, int):
+                return value
+    return None
+
+
 def _retry_with_backoff(
     operation_name: str,
     action: Callable[[], object],
@@ -71,6 +87,11 @@ def _retry_with_backoff(
             return action()
         except Exception as e:
             last_error = e
+            status_code = _extract_http_status_code(e)
+            if status_code is not None and 400 <= status_code < 500:
+                raise RuntimeError(
+                    f"{operation_name} 遇到不可重试的 HTTP {status_code} 错误: {e}"
+                ) from e
             if attempt >= total_attempts:
                 break
             delay = backoff_seconds[min(attempt - 1, len(backoff_seconds) - 1)] if backoff_seconds else 0
@@ -820,74 +841,67 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
 
     duration = _probe_audio_duration_seconds(audio_path) or 0.0
     segment_seconds = 600
-    segment_paths: list[str] = []
     segment_dir = tempfile.mkdtemp(prefix="xys_segments_", dir=output_dir)
 
     try:
         model_obj = _load_whisper_model_cached(model)
-        if duration > segment_seconds:
-            seg_pattern = os.path.join(segment_dir, "seg_%04d.mp3")
-            split_cmd = [
-                "ffmpeg",
-                "-hide_banner",
-                "-loglevel",
-                "error",
-                "-y",
-                "-i",
-                audio_path,
-                "-f",
-                "segment",
-                "-segment_time",
-                str(segment_seconds),
-                "-c",
-                "copy",
-                seg_pattern,
-            ]
-            split_proc = subprocess.run(split_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
-            if split_proc.returncode == 0:
-                segment_paths = sorted(
-                    os.path.join(segment_dir, n)
-                    for n in os.listdir(segment_dir)
-                    if n.endswith(".mp3")
-                )
-
-        if not segment_paths:
-            segment_paths = [audio_path]
-
-        texts: list[str] = []
-        total = len(segment_paths)
-        _log(f"Whisper 转写分段数: {total}")
-        transcribe_started_at = time.time()
-        for idx, seg_path in enumerate(segment_paths, start=1):
-            result = model_obj.transcribe(  # type: ignore[attr-defined]
-                seg_path,
-                fp16=False,
-                verbose=False,
-            )
-            chunk_text = (result.get("text") or "").strip()
-            if chunk_text:
-                texts.append(chunk_text)
-            _print_progress(f"[2/3] 转写进度 | elapsed {_format_elapsed(transcribe_started_at)}", idx, total)
-
-        transcript_text = "\n".join(t for t in texts if t).strip()
-        if not transcript_text:
-            raise RuntimeError("Whisper produced empty transcript text.")
-
-        with open(transcript_path, "w", encoding="utf-8") as f:
-            f.write(transcript_text)
-        _log(f"Whisper 转写完成，输出={transcript_path}")
-        return transcript_text
-    finally:
-        for p in segment_paths:
-            if p.startswith(segment_dir):
-                try:
-                    os.remove(p)
-                except OSError:
-                    pass
+        segment_paths: list[str] = []
         try:
-            os.rmdir(segment_dir)
-        except OSError:
-            pass
+            if duration > segment_seconds:
+                seg_pattern = os.path.join(segment_dir, "seg_%04d.mp3")
+                split_cmd = [
+                    "ffmpeg",
+                    "-hide_banner",
+                    "-loglevel",
+                    "error",
+                    "-y",
+                    "-i",
+                    audio_path,
+                    "-f",
+                    "segment",
+                    "-segment_time",
+                    str(segment_seconds),
+                    "-c",
+                    "copy",
+                    seg_pattern,
+                ]
+                split_proc = subprocess.run(split_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
+                if split_proc.returncode == 0:
+                    segment_paths = sorted(
+                        os.path.join(segment_dir, n)
+                        for n in os.listdir(segment_dir)
+                        if n.endswith(".mp3")
+                    )
+
+            if not segment_paths:
+                segment_paths = [audio_path]
+
+            texts: list[str] = []
+            total = len(segment_paths)
+            _log(f"Whisper 转写分段数: {total}")
+            transcribe_started_at = time.time()
+            for idx, seg_path in enumerate(segment_paths, start=1):
+                result = model_obj.transcribe(  # type: ignore[attr-defined]
+                    seg_path,
+                    fp16=False,
+                    verbose=False,
+                )
+                chunk_text = (result.get("text") or "").strip()
+                if chunk_text:
+                    texts.append(chunk_text)
+                _print_progress(f"[2/3] 转写进度 | elapsed {_format_elapsed(transcribe_started_at)}", idx, total)
+
+            transcript_text = "\n".join(t for t in texts if t).strip()
+            if not transcript_text:
+                raise RuntimeError("Whisper produced empty transcript text.")
+
+            with open(transcript_path, "w", encoding="utf-8") as f:
+                f.write(transcript_text)
+            _log(f"Whisper 转写完成，输出={transcript_path}")
+            return transcript_text
+        finally:
+            shutil.rmtree(segment_dir, ignore_errors=True)
+    finally:
         if model_obj is not None:
             del model_obj
             gc.collect()

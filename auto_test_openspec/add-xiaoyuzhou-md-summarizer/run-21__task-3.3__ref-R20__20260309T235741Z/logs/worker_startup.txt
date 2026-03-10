@@ -1,0 +1,23 @@
+UTC_TIMESTAMP: 2026-03-09T23:58:04Z
+CHANGE_ID: add-xiaoyuzhou-md-summarizer
+TASK: 3.3
+REF: R20
+GIT_BASE: 213b780
+
+GIT_LOG_EXCERPT (git log --oneline -20):
+213b780 Add total timeout cap for API calls (task 3.2, R19)
+5fa8f1b Fix file handle leak in _read_text_file (task 3.1, R18)
+047a984 perf: add early skip check to avoid unnecessary Whisper transcription
+0ec8fae Supervisor: RUN #18 bookkeeping (task 2.13 MAXED)
+bae8239 Supervisor: retroactive bookkeeping for RUN #5-17
+c5958fd Record R17 push validation attempt and result
+4b5960c Complete efficiency optimization tasks R5-R16 with validation bundles
+c882a15 feat: add 13 efficiency optimization tasks to OpenSpec
+acf304c feat: add progress tracking infrastructure
+6cc8da4 docs: add detailed implementation plan for efficiency optimization
+19bd1be 添加效率优化设计文档
+1a0e7db 初始提交：项目备份点
+
+OBSERVATION:
+- Tasks 3.1 (R18) and 3.2 (R19) are implemented; 3.3 (R20) remains pending.
+- Reported issue: Python Whisper model objects remain cached, accumulating multi-GB RAM per model during batch runs.

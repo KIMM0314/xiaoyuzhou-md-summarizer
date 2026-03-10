@@ -1,6 +1,6 @@
 {
   "change_id": "add-xiaoyuzhou-md-summarizer",
-  "generated_at": "2026-03-08T15:39:31Z",
+  "generated_at": "2026-03-10T00:18:42Z",
   "features": {
     "R1": {
       "category": "functional",
@@ -235,7 +235,7 @@
         "python3 -m py_compile main.py exits with code 0",
         "Grep confirms try/finally cleanup pattern"
       ],
-      "passes": false
+      "passes": true
     },
     "R22": {
       "category": "bugfix",
@@ -247,7 +247,7 @@
         "python3 -m py_compile main.py exits with code 0",
         "Grep confirms status code checking logic"
       ],
-      "passes": false
+      "passes": true
     }
   }
 }
