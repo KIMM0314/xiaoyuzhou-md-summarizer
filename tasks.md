@@ -235,7 +235,7 @@ EVIDENCE (RUN #21): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - run-folder MUST be: `run-<RUN#>__task-3.4__ref-R21__<YYYYMMDDThhmmssZ>/`
 
 BUNDLE (RUN #22): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z | HOW_TO_RUN: run.sh/run.bat
-EVIDENCE (RUN #22): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (_transcribe_with_python_whisper inner try/finally + shutil.rmtree cleanup), tasks.md, feature_list.json, validation bundle
+EVIDENCE (RUN #22): CODEX_CMD=manual-local-execution | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-22__task-3.4__ref-R21__20260310T001841Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: 4eb3c96 | COMMIT_MSG: "Fix incomplete temp audio segment cleanup (task 3.4, R21)" | DIFFSTAT: "15 files changed, 246 insertions(+), 490 deletions(-)" | FILES: main.py (shutil.rmtree in finally block), tasks.md, feature_list.json, validation bundles
 
 - [x] 3.5 Fix HTTP retry logic to skip non-retryable errors [#R22]
   - ACCEPT: Modify _retry_with_backoff to check HTTP status codes and skip retrying 4xx errors (only retry 5xx and network errors).
