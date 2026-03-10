@@ -213,7 +213,7 @@ EVIDENCE (RUN #19): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - run-folder MUST be: `run-<RUN#>__task-3.2__ref-R19__<YYYYMMDDThhmmssZ>/`
 
 BUNDLE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | HOW_TO_RUN: run.sh/run.bat
-EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | FILES: main.py (lines 58,64,78: total_timeout parameter with 300s default)
+EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --model gpt-5.2 -c model_reasoning_effort=medium | SCOPE: CLI | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z | WORKER_STARTUP_LOG: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-20__task-3.2__ref-R19__20260309T235225Z/logs/worker_startup.txt | VALIDATED_CLI: bash run.sh | EXIT_CODE: 0 | RESULT: PASS | GIT_COMMIT: 213b780 | COMMIT_MSG: "Add total timeout cap for API calls (task 3.2, R19)" | DIFFSTAT: "7 files changed, 78 insertions(+), 3 deletions(-)" | FILES: main.py (lines 58,64,78: total_timeout parameter with 300s default), tasks.md, feature_list.json, validation bundle
 
 - [ ] 3.3 Fix Whisper model cache memory leak [#R20]
   - ACCEPT: Add explicit model cleanup after transcription completes. Use del + gc.collect() or implement model pooling with size limits.
@@ -222,6 +222,8 @@ EVIDENCE (RUN #20): CODEX_CMD=codex exec --full-auto --skip-git-repo-check --mod
     - Grep confirms cleanup code is present
     - When done, generate validation bundle under: `auto_test_openspec/add-xiaoyuzhou-md-summarizer/<run-folder>/`
     - run-folder MUST be: `run-<RUN#>__task-3.3__ref-R20__<YYYYMMDDThhmmssZ>/`
+
+BUNDLE (RUN #21): LRU Whisper model cache max=2 + finally cleanup (del model_obj + gc.collect) | VALIDATION_BUNDLE: auto_test_openspec/add-xiaoyuzhou-md-summarizer/run-21__task-3.3__ref-R20__20260309_235741/ | HOW_TO_RUN: run.sh/run.bat
 
 - [ ] 3.4 Fix incomplete temp audio segment cleanup [#R21]
   - ACCEPT: Wrap audio segment processing in try/finally to ensure temp files are always deleted, even on errors.

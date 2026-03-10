@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import gc
 import hashlib
 import html.parser
 import html as html_lib
@@ -11,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections import OrderedDict
 from typing import Callable, Optional
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -757,7 +759,8 @@ def _download_to_file(url: str, dest_path: str) -> None:
         raise
 
 
-_WHISPER_MODEL_CACHE: dict[str, object] = {}
+_WHISPER_MODEL_CACHE_MAX = 2
+_WHISPER_MODEL_CACHE: "OrderedDict[str, object]" = OrderedDict()
 
 
 def _probe_audio_duration_seconds(audio_path: str) -> Optional[float]:
@@ -797,6 +800,15 @@ def _load_whisper_model_cached(model_name: str):
     if model_name not in _WHISPER_MODEL_CACHE:
         _log(f"加载 Whisper 模型: {model_name}（首次会慢一些）")
         _WHISPER_MODEL_CACHE[model_name] = whisper.load_model(model_name)
+    else:
+        _WHISPER_MODEL_CACHE.move_to_end(model_name)
+
+    while len(_WHISPER_MODEL_CACHE) > _WHISPER_MODEL_CACHE_MAX:
+        evicted_name, evicted_model = _WHISPER_MODEL_CACHE.popitem(last=False)
+        _log(f"释放 Whisper 模型缓存: {evicted_name}")
+        del evicted_model
+        gc.collect()
+
     return _WHISPER_MODEL_CACHE[model_name]
 
 
@@ -804,7 +816,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
     os.makedirs(output_dir, exist_ok=True)
     base = os.path.splitext(os.path.basename(audio_path))[0]
     transcript_path = os.path.join(output_dir, base + ".txt")
-    model_obj = _load_whisper_model_cached(model)
+    model_obj: Optional[object] = None
 
     duration = _probe_audio_duration_seconds(audio_path) or 0.0
     segment_seconds = 600
@@ -812,6 +824,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
     segment_dir = tempfile.mkdtemp(prefix="xys_segments_", dir=output_dir)
 
     try:
+        model_obj = _load_whisper_model_cached(model)
         if duration > segment_seconds:
             seg_pattern = os.path.join(segment_dir, "seg_%04d.mp3")
             split_cmd = [
@@ -846,7 +859,7 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
         _log(f"Whisper 转写分段数: {total}")
         transcribe_started_at = time.time()
         for idx, seg_path in enumerate(segment_paths, start=1):
-            result = model_obj.transcribe(
+            result = model_obj.transcribe(  # type: ignore[attr-defined]
                 seg_path,
                 fp16=False,
                 verbose=False,
@@ -875,6 +888,9 @@ def _transcribe_with_python_whisper(audio_path: str, *, output_dir: str, model: 
             os.rmdir(segment_dir)
         except OSError:
             pass
+        if model_obj is not None:
+            del model_obj
+            gc.collect()
 
 
 def _run_whisper(
